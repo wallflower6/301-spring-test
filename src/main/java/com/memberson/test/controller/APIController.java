@@ -7,13 +7,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 
+import com.google.gson.Gson;
+
 // import java.net.http.HttpClient;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.WebRequest;
@@ -30,7 +36,7 @@ public class APIController {
     String token;
 
     @GetMapping("/views")
-    public String getListings() {
+    public String getListings() throws ParseException {
         HttpClient httpClient;
 
         // test uri
@@ -63,9 +69,13 @@ public class APIController {
 
         ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, request, String.class, 1);
 
+        JSONParser parser = new JSONParser();
+
         // ResponseEntity<Post> response = this.restTemplate.exchange(uri, HttpMethod.GET, request, Post.class, 1);
         if (response.getStatusCode() == HttpStatus.OK) {
-            return response.getBody();
+            JSONObject json = (JSONObject) parser.parse(response.getBody());
+            String returnStr = "You searched for " + json.get("rewardName") + " with description '" + json.get("shortDescription") + "', expiring on " + json.get("expiredDate");
+            return returnStr;
         } 
         
         return "null";
