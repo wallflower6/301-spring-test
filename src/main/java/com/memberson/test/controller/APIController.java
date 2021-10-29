@@ -39,7 +39,7 @@ import org.springframework.web.servlet.ModelAndView;
 @RestController
 public class APIController {
 
-    String apiEndpoint = "https://c21sguat.memgate.com/api/";
+    String apiEndpoint = "https://c21sguat.memgate.com/api/"; // get from PAR
 
     @Value("${svc.auth}")
     String svcAuth;
@@ -49,6 +49,7 @@ public class APIController {
 
     @RequestMapping(value="/signup",method=RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
     public void signUp(@RequestBody String details) {
+
         JSONParser parser = new JSONParser();
         JSONObject detailsJSON = new JSONObject();
 
@@ -77,7 +78,7 @@ public class APIController {
         try {
             pwdJson = (JSONObject) parser.parse(password);
         } catch (ParseException e) {
-            
+            System.out.println(e);
         }
 
         String uri = apiEndpoint + "profile/01820932/signin";
@@ -112,6 +113,10 @@ public class APIController {
         
         JSONParser parser = new JSONParser();
 
+        if (response == null) {
+            System.out.println("No response returned.");
+            return null;
+        }
         if (response.getStatusCode() == HttpStatus.OK) {
             try {
                 JSONObject json = (JSONObject) parser.parse(response.getBody());
